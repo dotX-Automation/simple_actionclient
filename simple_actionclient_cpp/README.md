@@ -4,7 +4,7 @@ C++ library that wraps the `rclcpp` action client providing a simpler interface.
 
 ## Contents
 
-This package offers the `simple_actionclient_cpp::Client<ActionT>` class template, that can be used to create a ROS 2 action client just by passing the node and the action name, and optionally a feedback callback of the appropriate type, *i.e.*, `std::function<void (const typename rclcpp_action::ClientGoalHandle<ActionT>::SharedPtr, const typename ActionT::Feedback::ConstSharedPtr)>`.
+This package offers the `simple_actionclient::Client<ActionT>` class template, that can be used to create a ROS 2 action client just by passing the node and the action name, and optionally a feedback callback of the appropriate type, *i.e.*, `std::function<void (const typename rclcpp_action::ClientGoalHandle<ActionT>::SharedPtr, const typename ActionT::Feedback::ConstSharedPtr)>`.
 
 The client offers methods to either perform all the major operations pertaining to the lifetime of an action goal individually, or to execute an entire action goal in a single call. Each API method is documented in the code, and has a normal and a `sync`, *i.e.* blocking, variant.
 
@@ -26,7 +26,7 @@ std::shared_ptr<SimpleActionClient::Client<Fibonacci>> fib_client;
 Then, you can initialize it in the node constructor, or elsewhere, like this:
 
 ```cpp
-fib_client = std::make_shared<simple_actionclient_cpp::Client<Fibonacci>>(
+fib_client = std::make_shared<simple_actionclient::Client<Fibonacci>>(
   this,
   "/fibonacci",
   std::bind(

@@ -39,7 +39,7 @@
 
 #include <action_msgs/srv/cancel_goal.hpp>
 
-namespace simple_actionclient_cpp
+namespace simple_actionclient
 {
 
 /* Feedback callback type. */
@@ -317,6 +317,6 @@ private:
   typename rclcpp_action::Client<ActionT>::SendGoalOptions client_opts_;
 };
 
-} // namespace simple_actionclient_cpp
+} // namespace simple_actionclient
 
 #endif // SIMPLE_ACTIONCLIENT_CPP__SIMPLE_ACTIONCLIENT_HPP_
