@@ -74,7 +74,7 @@ public:
   explicit Client(
     rclcpp::Node * node,
     const std::string & action_name,
-    const SimpleActionClient::FeedbackCallbackT<ActionT> & feedback_callback = nullptr,
+    const FeedbackCallbackT<ActionT> & feedback_callback = nullptr,
     bool wait = true)
   : node_(node),
     action_name_(action_name),

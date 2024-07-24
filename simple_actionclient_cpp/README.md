@@ -20,7 +20,7 @@ More specifically:
 Consider the following short example. Within your node class, you can define a member variable to point to a client, like this:
 
 ```cpp
-std::shared_ptr<SimpleActionClient::Client<Fibonacci>> fib_client;
+std::shared_ptr<simple_actionclient::Client<Fibonacci>> fib_client;
 ```
 
 Then, you can initialize it in the node constructor, or elsewhere, like this:
