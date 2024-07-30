@@ -117,14 +117,19 @@ public:
    * @brief Sends a new goal to the server and waits for the response.
    *
    * @param goal_msg The goal message to be sent.
+   * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The goal handle.
    */
   typename ActionGoalHandleT::SharedPtr send_goal_sync(
     const typename ActionT::Goal & goal_msg,
+    bool spin = false,
     int64_t timeout_msec = 0)
   {
     auto goal_future = send_goal(goal_msg);
+    if (!spin) {
+      return goal_future.get();
+    }
     if (timeout_msec <= 0) {
       auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), goal_future);
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
@@ -159,14 +164,19 @@ public:
    * @brief Cancels a given goal and waits for the cancellation result.
    *
    * @param goal_handle The goal handle to be canceled.
+   * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The cancellation response.
    */
   action_msgs::srv::CancelGoal::Response::SharedPtr cancel_sync(
     const typename ActionGoalHandleT::SharedPtr goal_handle,
+    bool spin = false,
     int64_t timeout_msec = 0)
   {
     auto cancel_future = cancel(goal_handle);
+    if (!spin) {
+      return cancel_future.get();
+    }
     if (timeout_msec <= 0) {
       auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), cancel_future);
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
@@ -201,14 +211,19 @@ public:
    * @brief Requests the goal result to the server and waits for the response.
    *
    * @param goal_handle The goal handle to be used.
+   * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The goal WrappedResult object.
    */
   std::shared_ptr<typename ActionGoalHandleT::WrappedResult> get_result_sync(
     const typename ActionGoalHandleT::SharedPtr goal_handle,
+    bool spin = false,
     int64_t timeout_msec = 0)
   {
     auto result_future = get_result(goal_handle);
+    if (!spin) {
+      return std::make_shared<typename ActionGoalHandleT::WrappedResult>(result_future.get());
+    }
     if (timeout_msec <= 0) {
       auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), result_future);
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
@@ -246,7 +261,7 @@ public:
     int64_t cancel_timeout_msec = 0)
   {
     // Send the goal
-    auto goal_handle = send_goal_sync(goal_msg, send_goal_timeout_msec);
+    auto goal_handle = send_goal_sync(goal_msg, true, send_goal_timeout_msec);
     if (!goal_handle) {
       RCLCPP_ERROR(
         node_->get_logger(),
@@ -265,7 +280,7 @@ public:
     // In the last case, the following can happen:
     // - The goal cancellation response arrives before the timeout expires
     // - The timeout expires before a cancellation response is received
-    auto goal_result = get_result_sync(goal_handle, get_result_timeout_msec);
+    auto goal_result = get_result_sync(goal_handle, true, get_result_timeout_msec);
     if (goal_result != nullptr) {
       // The goal was completed before the timeout expired
       RCLCPP_INFO(node_->get_logger(), "%s: goal COMPLETED", action_name_.c_str());
@@ -283,7 +298,7 @@ public:
           return std::make_tuple(true, rclcpp_action::ResultCode::CANCELED, nullptr);
         } else {
           // We should cancel the goal and wait for the result
-          auto cancel_result = cancel_sync(goal_handle, cancel_timeout_msec);
+          auto cancel_result = cancel_sync(goal_handle, true, cancel_timeout_msec);
           if (cancel_result != nullptr) {
             // Goal cancellation response arrived before the timeout expired
             RCLCPP_INFO(

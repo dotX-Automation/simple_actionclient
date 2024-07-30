@@ -10,9 +10,9 @@ The client offers methods to either perform all the major operations pertaining 
 
 More specifically:
 
-- `send_goal` sends a new goal to the server, and returns a `std::shared_future<typename ActionGoalHandleT::SharedPtr>` that can be used to wait for the result of the goal. The `sync` variant returns the goal handle pointer directly.
-- `cancel` cancels a given goal, and returns a `std::shared_future<action_msgs::srv::CancelGoal::Response::SharedPtr>` that can be used to wait for the result of the cancellation. The `sync` variant returns the cancellation result directly.
-- `get_result` returns a `std::shared_future<typename ActionGoalHandleT::WrappedResult>` that can be used to wait for the result of a given goal. The `sync` variant returns the `WrappedResult` object directly.
+- `send_goal` sends a new goal to the server, and returns a `std::shared_future<typename ActionGoalHandleT::SharedPtr>` that can be used to wait for the result of the goal. The `sync` variant returns the goal handle pointer directly, eventually spinning the node if requested.
+- `cancel` cancels a given goal, and returns a `std::shared_future<action_msgs::srv::CancelGoal::Response::SharedPtr>` that can be used to wait for the result of the cancellation. The `sync` variant returns the cancellation result directly, eventually spinning the node if requested.
+- `get_result` returns a `std::shared_future<typename ActionGoalHandleT::WrappedResult>` that can be used to wait for the result of a given goal. The `sync` variant returns the `WrappedResult` object directly, eventually spinning the node if requested.
 - `call_sync` performs an action call in a single operation. Timeouts can be specified for the goal and the result, and the goal can be canceled if the result is not received in time. The method returns an `std::tuple<bool, rclcpp_action::ResultCode, std::shared_ptr<ActionResultT>>` containing the accepted flag, the result code, and a pointer to the result object; the values of all the different fields can tell whether the goal was accepted, whether the result was received in time, whether the goal was canceled, and whether the server stopped responding.
 
 ## Usage
