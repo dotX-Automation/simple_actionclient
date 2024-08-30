@@ -153,6 +153,8 @@ public:
    *
    * @param goal_handle The goal handle to be canceled.
    * @return The cancellation response future.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   std::shared_future<action_msgs::srv::CancelGoal::Response::SharedPtr> cancel(
     const typename ActionGoalHandleT::SharedPtr goal_handle)
@@ -167,6 +169,8 @@ public:
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The cancellation response.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   action_msgs::srv::CancelGoal::Response::SharedPtr cancel_sync(
     const typename ActionGoalHandleT::SharedPtr goal_handle,
@@ -200,6 +204,8 @@ public:
    *
    * @param goal_handle The goal handle to be used.
    * @return Future to the WrappedResult object.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   std::shared_future<typename ActionGoalHandleT::WrappedResult> get_result(
     const typename ActionGoalHandleT::SharedPtr goal_handle)
@@ -214,6 +220,8 @@ public:
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The goal WrappedResult object.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   std::shared_ptr<typename ActionGoalHandleT::WrappedResult> get_result_sync(
     const typename ActionGoalHandleT::SharedPtr goal_handle,
@@ -249,6 +257,8 @@ public:
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
    * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
    * @return The goal WrappedResult object or nullptr if the cancellation was rejected or something else went wrong.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   std::shared_ptr<typename ActionGoalHandleT::WrappedResult> cancel_and_get_result_sync(
     const typename ActionGoalHandleT::SharedPtr goal_handle,
@@ -278,6 +288,8 @@ public:
    * @param cancel_timeout_msec The timeout to be used when canceling the goal (milliseconds).
    *
    * @return Tuple containing accepted flag, result code, and pointer to the result message.
+   *
+   * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
    */
   std::tuple<bool, rclcpp_action::ResultCode, std::shared_ptr<ActionResultT>> call_sync(
     const typename ActionT::Goal & goal_msg,
