@@ -121,7 +121,7 @@ class Client():
         """
         return goal_handle.cancel_goal_async()
 
-    def cancel_sync(self, goal_handle: ClientGoalHandle, timeout_sec: float = None) -> ResultType:
+    def cancel_sync(self, goal_handle: ClientGoalHandle, timeout_sec: float = None) -> CancelGoal.Response:
         """
         Cancels the specified goal.
         Wraps back-end operations while waiting for the Future to complete.
@@ -172,6 +172,27 @@ class Client():
                 return result_future.result()
             else:
                 return None
+
+    def cancel_and_get_result_sync(
+            self,
+            goal_handle: ClientGoalHandle,
+            timeout_sec: float = None) -> ResultType:
+        """
+        Cancels the specified goal and waits for the result.
+
+        :param goal_handle: Goal handle to use.
+        :param timeout_sec: Maximum time to wait for the result (seconds).
+        :returns: Result, or None if the server didn't respond, errored out, or the cancellation request got rejected.
+        """
+        # First, cancel the goal
+        cancel_result = self.cancel_sync(goal_handle)
+        if cancel_result == None or \
+            (cancel_result.return_code != CancelGoal.Response.ERROR_NONE and
+             cancel_result.return_code != CancelGoal.Response.ERROR_GOAL_TERMINATED):
+            return None
+
+        # Then, get the result
+        return self.get_result_sync(goal_handle, timeout_sec)
 
     def call(
             self,
@@ -226,24 +247,29 @@ class Client():
                 self._node.get_logger().error("{}: goal timed out".format(self._client._action_name))
                 return (True, GoalStatus.STATUS_UNKNOWN, None)
             else:
-                self._node.get_logger().warn("{}: goal timed out, CANCELING...".format(self._client._action_name))
+                self._node.get_logger().warn(
+                    "{}: goal timed out, CANCELING...".format(self._client._action_name))
                 if cancel_timeout_sec is not None and cancel_timeout_sec == 0.0:
                     # We should cancel the goal without waiting for the result
                     self.cancel(goal_handle)
                     return (True, GoalStatus.STATUS_CANCELING, None)
                 else:
                     # We should cancel the goal and wait for the result
-                    cancel_result = self.cancel_sync(goal_handle, cancel_timeout_sec)
+                    cancel_result = self.cancel_sync(
+                        goal_handle,
+                        cancel_timeout_sec)
                     if cancel_result is not None:
                         # Goal cancellation response arrived before the timeout expired
-                        self._node.get_logger().info("{}: goal cancellation response received".format(self._client._action_name))
+                        self._node.get_logger().info(
+                            "{}: goal cancellation response received".format(self._client._action_name))
                         if cancel_result.return_code == CancelGoal.Response.ERROR_NONE:
                             return (True, GoalStatus.STATUS_CANCELED, None)
                         else:
                             return (True, GoalStatus.STATUS_UNKNOWN, None)
                     else:
                         # Timeout expired before a cancellation response was received
-                        self._node.get_logger.warn("{}: goal cancellation timed out".format(self._client._action_name))
+                        self._node.get_logger.warn(
+                            "{}: goal cancellation timed out".format(self._client._action_name))
                         return (True, GoalStatus.STATUS_CANCELING, None)
 
     def _wait_spinning(self, future: Future, timeout_sec: float) -> bool:

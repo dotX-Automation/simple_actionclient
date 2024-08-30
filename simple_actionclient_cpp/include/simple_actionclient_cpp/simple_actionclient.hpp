@@ -243,6 +243,32 @@ public:
   }
 
   /**
+   * @brief Cancels a given goal and waits for the action's completion, returning the result.
+   *
+   * @param goal_handle The goal handle to be canceled.
+   * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
+   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
+   * @return The goal WrappedResult object or nullptr if the cancellation was rejected or something else went wrong.
+   */
+  std::shared_ptr<typename ActionGoalHandleT::WrappedResult> cancel_and_get_result_sync(
+    const typename ActionGoalHandleT::SharedPtr goal_handle,
+    bool spin = false,
+    int64_t timeout_msec = 0)
+  {
+    // First, try to cancel the goal
+    auto cancel_result = cancel_sync(goal_handle, spin, timeout_msec);
+    if (cancel_result == nullptr ||
+      (cancel_result->return_code != action_msgs::srv::CancelGoal::Response::ERROR_NONE &&
+      cancel_result->return_code != action_msgs::srv::CancelGoal::Response::ERROR_GOAL_TERMINATED))
+    {
+      return nullptr;
+    }
+
+    // Then, get the result
+    return get_result_sync(goal_handle, spin, timeout_msec);
+  }
+
+  /**
    * @brief Calls the action, returns only when it has been completed, or canceled, or timed out.
    *
    * @param goal_msg The goal message to be sent.
