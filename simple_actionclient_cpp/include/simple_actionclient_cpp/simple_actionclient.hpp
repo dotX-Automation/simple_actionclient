@@ -282,6 +282,7 @@ public:
    * @brief Calls the action, returns only when it has been completed, or canceled, or timed out.
    *
    * @param goal_msg The goal message to be sent.
+   * @param spin Enables node spinning, else this will block waiting on the futures ("get" call).
    * @param cancel_on_timeout Whether to cancel the goal if it times out.
    * @param send_goal_timeout_msec The timeout to be used when sending the goal (milliseconds).
    * @param get_result_timeout_msec The timeout to be used when waiting for the result (milliseconds).
@@ -293,13 +294,14 @@ public:
    */
   std::tuple<bool, rclcpp_action::ResultCode, std::shared_ptr<ActionResultT>> call_sync(
     const typename ActionT::Goal & goal_msg,
+    bool spin = true,
     bool cancel_on_timeout = false,
     int64_t send_goal_timeout_msec = 0,
     int64_t get_result_timeout_msec = 0,
     int64_t cancel_timeout_msec = 0)
   {
     // Send the goal
-    auto goal_handle = send_goal_sync(goal_msg, true, send_goal_timeout_msec);
+    auto goal_handle = send_goal_sync(goal_msg, spin, send_goal_timeout_msec);
     if (!goal_handle) {
       RCLCPP_ERROR(
         node_->get_logger(),
@@ -318,7 +320,7 @@ public:
     // In the last case, the following can happen:
     // - The goal cancellation response arrives before the timeout expires
     // - The timeout expires before a cancellation response is received
-    auto goal_result = get_result_sync(goal_handle, true, get_result_timeout_msec);
+    auto goal_result = get_result_sync(goal_handle, spin, get_result_timeout_msec);
     if (goal_result != nullptr) {
       // The goal was completed before the timeout expired
       RCLCPP_INFO(node_->get_logger(), "%s: goal COMPLETED", action_name_.c_str());
@@ -336,7 +338,7 @@ public:
           return std::make_tuple(true, rclcpp_action::ResultCode::CANCELED, nullptr);
         } else {
           // We should cancel the goal and wait for the result
-          auto cancel_result = cancel_sync(goal_handle, true, cancel_timeout_msec);
+          auto cancel_result = cancel_sync(goal_handle, spin, cancel_timeout_msec);
           if (cancel_result != nullptr) {
             // Goal cancellation response arrived before the timeout expired
             RCLCPP_INFO(
