@@ -61,6 +61,12 @@ public:
   using ActionGoalHandleT = typename rclcpp_action::ClientGoalHandle<ActionT>;
   using ActionResultT = typename ActionT::Result;
 
+  using SharedPtr = std::shared_ptr<Client<ActionT>>;
+  using WeakPtr = std::weak_ptr<Client<ActionT>>;
+  using UniquePtr = std::unique_ptr<Client<ActionT>>;
+  using ConstSharedPtr = std::shared_ptr<const Client<ActionT>>;
+  using ConstWeakPtr = std::weak_ptr<const Client<ActionT>>;
+
   /**
    * @brief Constructor, can wait for the server to become active.
    *
