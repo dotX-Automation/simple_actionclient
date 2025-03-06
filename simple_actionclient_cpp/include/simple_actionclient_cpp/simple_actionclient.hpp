@@ -22,8 +22,7 @@
  * limitations under the License.
  */
 
-#ifndef SIMPLE_ACTIONCLIENT_CPP__SIMPLE_ACTIONCLIENT_HPP_
-#define SIMPLE_ACTIONCLIENT_CPP__SIMPLE_ACTIONCLIENT_HPP_
+#pragma once
 
 #include "visibility_control.h"
 
@@ -100,11 +99,6 @@ public:
         "Action %s not available...",
         action_name.c_str());
     }
-
-    RCLCPP_INFO(
-      node_->get_logger(),
-      "Initialized client for action %s",
-      action_name.c_str());
   }
 
   /**
@@ -379,5 +373,3 @@ private:
 };
 
 } // namespace simple_actionclient
-
-#endif // SIMPLE_ACTIONCLIENT_CPP__SIMPLE_ACTIONCLIENT_HPP_
