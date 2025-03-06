@@ -363,6 +363,11 @@ public:
     }
   }
 
+  [[nodiscard]] inline std::string get_action_name() const
+  {
+    return action_name_;
+  }
+
 private:
   rclcpp::Node * node_;
   std::string action_name_;
