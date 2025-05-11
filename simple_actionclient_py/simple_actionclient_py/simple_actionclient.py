@@ -80,9 +80,6 @@ class Client():
             self._node.get_logger().warn(
                 "Action {} not available...".format(self._client._action_name))
 
-        self._node.get_logger().info(
-            "Initialized client for action {}".format(self._client._action_name))
-
     def send_goal(self, goal_msg: GoalType) -> Future:
         """
         Sends a new goal to the server.
