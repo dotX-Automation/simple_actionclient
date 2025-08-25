@@ -126,21 +126,22 @@ public:
     bool spin = false,
     int64_t timeout_msec = 0)
   {
+    // The not-a-timeout is the default value for the no-timeout in the rclcpp API
+    auto timeout = (timeout_msec <= 0) ?
+      std::chrono::milliseconds(5000) :
+      std::chrono::milliseconds(timeout_msec);
+
     auto goal_future = send_goal(goal_msg);
     if (!spin) {
-      return goal_future.get();
-    }
-    if (timeout_msec <= 0) {
-      auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), goal_future);
-      if (err != rclcpp::FutureReturnCode::SUCCESS) {
-        return nullptr;
+      if (goal_future.wait_for(timeout) == std::future_status::ready) {
+        return goal_future.get();
       }
-      return goal_future.get();
+      return nullptr;
     } else {
       auto err = rclcpp::spin_until_future_complete(
         node_->shared_from_this(),
         goal_future,
-        std::chrono::milliseconds(timeout_msec));
+        std::chrono::milliseconds(timeout));
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
         return nullptr;
       }
@@ -177,21 +178,22 @@ public:
     bool spin = false,
     int64_t timeout_msec = 0)
   {
+    // The not-a-timeout is the default value for the no-timeout in the rclcpp API
+    auto timeout = (timeout_msec <= 0) ?
+      std::chrono::milliseconds(5000) :
+      std::chrono::milliseconds(timeout_msec);
+
     auto cancel_future = cancel(goal_handle);
     if (!spin) {
-      return cancel_future.get();
-    }
-    if (timeout_msec <= 0) {
-      auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), cancel_future);
-      if (err != rclcpp::FutureReturnCode::SUCCESS) {
-        return nullptr;
+      if (cancel_future.wait_for(timeout) == std::future_status::ready) {
+        return cancel_future.get();
       }
-      return cancel_future.get();
+      return nullptr;
     } else {
       auto err = rclcpp::spin_until_future_complete(
         node_->shared_from_this(),
         cancel_future,
-        std::chrono::milliseconds(timeout_msec));
+        std::chrono::milliseconds(timeout));
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
         return nullptr;
       }
@@ -228,21 +230,22 @@ public:
     bool spin = false,
     int64_t timeout_msec = 0)
   {
+    // The not-a-timeout is the default value for the no-timeout in the rclcpp API
+    auto timeout = (timeout_msec <= 0) ?
+      std::chrono::milliseconds(5000) :
+      std::chrono::milliseconds(timeout_msec);
+
     auto result_future = get_result(goal_handle);
     if (!spin) {
-      return std::make_shared<typename ActionGoalHandleT::WrappedResult>(result_future.get());
-    }
-    if (timeout_msec <= 0) {
-      auto err = rclcpp::spin_until_future_complete(node_->shared_from_this(), result_future);
-      if (err != rclcpp::FutureReturnCode::SUCCESS) {
-        return nullptr;
+      if (result_future.wait_for(timeout) == std::future_status::ready) {
+        return std::make_shared<typename ActionGoalHandleT::WrappedResult>(result_future.get());
       }
-      return std::make_shared<typename ActionGoalHandleT::WrappedResult>(result_future.get());
+      return nullptr;
     } else {
       auto err = rclcpp::spin_until_future_complete(
         node_->shared_from_this(),
         result_future,
-        std::chrono::milliseconds(timeout_msec));
+        std::chrono::milliseconds(timeout));
       if (err != rclcpp::FutureReturnCode::SUCCESS) {
         return nullptr;
       }
