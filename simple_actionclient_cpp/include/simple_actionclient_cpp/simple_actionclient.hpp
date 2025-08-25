@@ -283,6 +283,8 @@ public:
 
   /**
    * @brief Calls the action, returns only when it has been completed, or canceled, or timed out.
+   * A 0 timeout means no timeout: goal and results will wait up to 5 s, cancellations will
+   * happen instantly (i.e. without waiting for the result).
    *
    * @param goal_msg The goal message to be sent.
    * @param spin Enables node spinning, else this will block waiting on the futures ("get" call).
