@@ -53,8 +53,7 @@ class Client():
             type: ActionType,
             action_name: str,
             feedback_callback: FeedbackCallbackType = None,
-            wait: bool = True,
-            spin_period=0.1) -> None:
+            wait: bool = True) -> None:
         """
         Creates a new Client.
         Can wait for the server to become active.
@@ -64,12 +63,10 @@ class Client():
         :param action_name: Name of the action to look for.
         :param feedback_callback: Feedback routine.
         :param wait: Indicates whether to wait for the server immediately.
-        :param spin_period: Period of the internal spinning loop (seconds).
         """
         # Initialize internal attributes
         self._node = node
         self._feedback_callback = feedback_callback
-        self._spin_period = spin_period
 
         # Create the ROS 2 action client
         self._client = ActionClient(self._node, type, action_name)
