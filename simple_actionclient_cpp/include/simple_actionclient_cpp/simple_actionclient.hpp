@@ -118,7 +118,7 @@ public:
    *
    * @param goal_msg The goal message to be sent.
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
-   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
+   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds), 0 means default timeout.
    * @return The goal handle.
    */
   typename ActionGoalHandleT::SharedPtr send_goal_sync(
@@ -168,7 +168,7 @@ public:
    *
    * @param goal_handle The goal handle to be canceled.
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
-   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
+   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds), 0 means default timeout.
    * @return The cancellation response.
    *
    * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
@@ -220,7 +220,7 @@ public:
    *
    * @param goal_handle The goal handle to be used.
    * @param spin Enables node spinning, else this will block waiting on the future ("get" call).
-   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds).
+   * @param timeout_msec The timeout to be used when waiting for the response (milliseconds), 0 means default timeout.
    * @return The goal WrappedResult object.
    *
    * @throws rclcpp_action::exceptions::UnknownGoalHandleError if the goal handle is not known.
@@ -299,7 +299,7 @@ public:
    */
   std::tuple<bool, rclcpp_action::ResultCode, std::shared_ptr<ActionResultT>> call_sync(
     const typename ActionT::Goal & goal_msg,
-    bool spin = true,
+    bool spin = false,
     bool cancel_on_timeout = false,
     int64_t send_goal_timeout_msec = 0,
     int64_t get_result_timeout_msec = 0,

@@ -96,7 +96,7 @@ class Client():
         """
         Sends a new goal and waits for the response of the server.
         Wraps back-end operations while waiting for the Future to complete.
-        A None or <= 0.0 timeout means no timeout.
+        A None or <= 0.0 timeout means default timeout.
 
         :param goal_msg: Goal to send.
         :param spin: If True, spins the node while waiting, else the calling thread just sleeps.
@@ -108,7 +108,7 @@ class Client():
 
         goal_future = self.send_goal(goal_msg)
         if spin:
-            rclpy.spin_until_future_complete(self._node, goal_future, None, timeout_sec)
+            rclpy.spin_until_future_complete(self._node, goal_future, None, timeout_s)
         else:
             self._wait_for(goal_future, timeout_s)
         if not goal_future.done():
@@ -132,7 +132,7 @@ class Client():
         """
         Cancels the specified goal.
         Wraps back-end operations while waiting for the Future to complete.
-        A None or <= 0.0 timeout means no timeout.
+        A None or <= 0.0 timeout means default timeout.
 
         :param goal_handle: Goal handle to use.
         :param spin: If True, spins the node while waiting, else the calling thread just sleeps.
@@ -144,7 +144,7 @@ class Client():
 
         cancel_future = self.cancel(goal_handle)
         if spin:
-            rclpy.spin_until_future_complete(self._node, cancel_future, None, timeout_sec)
+            rclpy.spin_until_future_complete(self._node, cancel_future, None, timeout_s)
         else:
             self._wait_for(cancel_future, timeout_s)
         if not cancel_future.done():
@@ -168,7 +168,7 @@ class Client():
         """
         Asks the server for the result of the specified goal.
         Wraps back-end operations while waiting for the Future to complete.
-        A None or <= 0.0 timeout means no timeout.
+        A None or <= 0.0 timeout means default timeout.
 
         :param goal_handle: Goal handle to use.
         :param spin: If True, spins the node while waiting, else the calling thread just sleeps.
@@ -180,7 +180,7 @@ class Client():
 
         result_future = self.get_result(goal_handle)
         if spin:
-            rclpy.spin_until_future_complete(self._node, result_future, None, timeout_sec)
+            rclpy.spin_until_future_complete(self._node, result_future, None, timeout_s)
         else:
             self._wait_for(result_future, timeout_s)
         if not result_future.done():
@@ -213,7 +213,7 @@ class Client():
     def call(
             self,
             goal_msg: GoalType,
-            spin: bool = True,
+            spin: bool = False,
             cancel_on_timeout: bool = False,
             send_goal_timeout: float = 0.0,
             get_result_timeout: float = 0.0,
@@ -223,7 +223,7 @@ class Client():
         Can cancel the action automatically if the timeout expires while waiting
         for the action result.
         All wait operations timeouts can be set.
-        A 0.0 timeout means no timeout: goal and results will wait up to 5 s, cancellations will
+        A 0.0 timeout means default timeout: goal and results will wait up to 5 s, cancellations will
         happen instantly (i.e. without waiting for the result).
 
         :param goal_msg: Goal message to send.
@@ -288,7 +288,7 @@ class Client():
                             return (True, GoalStatus.STATUS_UNKNOWN, None)
                     else:
                         # Timeout expired before a cancellation response was received
-                        self._node.get_logger.warn(
+                        self._node.get_logger().warn(
                             "{}: goal cancellation timed out".format(self._client._action_name))
                         return (True, GoalStatus.STATUS_CANCELING, None)
 
